@@ -19,7 +19,8 @@ end
 -- DONE -> TODO: removes the `CLOSED:` line below.
 M.toggle = function()
 	local line = vim.api.nvim_get_current_line()
-	local checkbox = line:match("^%s*%- %[(%w+)%]")
+	local marker = line:match("^%s*([%-%*+])")
+	local checkbox = line:match("^%s*[%-%*+] %[(%w+)%]")
 
 	local cursor = vim.api.nvim_win_get_cursor(0)
 	local closed_pat = "^%s*CLOSED: .*$"
@@ -35,6 +36,7 @@ M.toggle = function()
 		local closed_line = indent .. "CLOSED: [" .. now .. "]"
 		vim.api.nvim_put({ closed_line }, "l", true, true)
 
+		vim.api.nvim_win_set_cursor(0, cursor)
 		vim.notify("Marked as DONE", vim.log.levels.INFO)
 	elseif checkbox == "DONE" then
 		-- Remove CLOSED line below if present
@@ -49,12 +51,17 @@ M.toggle = function()
 		new_line = new_line:gsub("%[DONE%]", "[TODO]")
 		vim.api.nvim_set_current_line(new_line)
 
+		vim.api.nvim_win_set_cursor(0, cursor)
 		vim.notify("Marked as TODO", vim.log.levels.INFO)
 	else
-		-- Not a checkbox line, add TODO
-		local new_line = line:gsub("^%s*", "")
-		new_line = "- [TODO] " .. new_line
+		-- Not a checkbox line, insert [TODO] after existing list marker (or add one)
+		local indent = line:match("^(%s*)")
+		local list_marker = marker or "-"
+		local rest = line:match("^%s*[%-%*+]%s*(.*)") or line:match("^%s*(.*)")
+		local new_line = indent .. list_marker .. " [TODO] " .. rest
 		vim.api.nvim_set_current_line(new_line)
+
+		vim.api.nvim_win_set_cursor(0, cursor)
 		vim.notify("Added TODO", vim.log.levels.INFO)
 	end
 end
