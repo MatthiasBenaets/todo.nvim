@@ -1,4 +1,4 @@
-- [TODO] # todo.nvim
+# todo.nvim
 
 Toggle TODO/DONE checkboxes in Neovim with optional `CLOSED:` timestamps.
 
@@ -24,7 +24,6 @@ require("todo").toggle()
 ```
 
 ### Behaviour
-
 | State | Action | Result |
 |-------|--------|--------|
 | `- [TODO] task` | `:TodoToggle` | `- [DONE] task` + `CLOSED: [2025-01-15 Wed 14:30]` |
